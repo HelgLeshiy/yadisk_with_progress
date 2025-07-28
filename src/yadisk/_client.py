@@ -1216,6 +1216,7 @@ class Client:
         get_download_link_function: Callable,
         src_path: str,
         file_or_path: FileOrPathDestination,
+        progress_callback,
         /,
         **kwargs
     ) -> None:
@@ -1285,6 +1286,7 @@ class Client:
                                 return
 
                             file.write(chunk)
+                            progress_callback(len(chunk))
 
                         response.download(consume)
 
@@ -1294,7 +1296,10 @@ class Client:
                         if response.status != 200:
                             raise response.get_exception()
 
-                        response.download(file.write)
+                        def extra_callback(chunk):
+                            progress_callback(len(chunk))
+
+                        response.download(file.write, extra_callback)
 
             auto_retry(attempt, n_retries, retry_interval)
         finally:
@@ -2688,6 +2693,7 @@ class Client:
         self,
         public_key: str,
         file_or_path: FileOrPathDestination,
+        progress_callback,
         /,
         **kwargs
     ) -> SyncPublicResourceLinkObject:
@@ -2718,7 +2724,7 @@ class Client:
 
         self._download(
             lambda public_key, **kwargs: self.get_public_download_link(public_key, **kwargs),
-            public_key, file_or_path, **kwargs)
+            public_key, file_or_path, progress_callback, **kwargs)
 
         return SyncPublicResourceLinkObject.from_public_key(public_key, yadisk=self)
 

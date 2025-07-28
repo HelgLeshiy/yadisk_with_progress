@@ -61,7 +61,7 @@ class Response:
         """
         raise NotImplementedError
 
-    def download(self, consume_callback: ConsumeCallback) -> None:
+    def download(self, consume_callback: ConsumeCallback, extra_callback: ConsumeCallback | None = None) -> None:
         """
             Downloads response's content.
 

@@ -61,10 +61,14 @@ class RequestsResponse(Response):
         except RuntimeError as e:
             raise ValueError(f"Could not parse JSON: {e}") from e
 
-    def download(self, consume_callback: ConsumeCallback) -> None:
+    def download(self, consume_callback: ConsumeCallback, extra_callback: ConsumeCallback | None = None) -> None:
         try:
             for chunk in self._response.iter_content(8192):
                 consume_callback(chunk)
+
+                if extra_callback is not None:
+                    extra_callback(chunk)
+
         except requests.RequestException as e:
             raise convert_requests_exception(e) from e
 

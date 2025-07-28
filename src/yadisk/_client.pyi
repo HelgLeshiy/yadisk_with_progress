@@ -1325,6 +1325,7 @@ class Client:
         self,
         public_key: str,
         file_or_path: FileOrPathDestination,
+        progress_callback,
         /,
         *,
         path: Optional[str] = None,
